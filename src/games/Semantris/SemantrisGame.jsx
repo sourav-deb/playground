@@ -117,17 +117,23 @@ export const SemantrisGame = () => {
         }
     }, [gameState, words, isThinking]);
 
+    // Keep ref to latest spawn function to avoid interval resets
+    const spawnRef = useRef();
+    useEffect(() => {
+        spawnRef.current = spawnNextWord;
+    });
+
     // Game Loop (Gravity)
     useEffect(() => {
         if (gameState !== 'playing') return;
 
         const loop = setInterval(() => {
-            spawnNextWord();
+            spawnRef.current?.();
         }, Math.max(GRAVITY_SPEED_MIN, GRAVITY_SPEED_INITIAL - (level * 200)));
 
         gameLoopRef.current = loop;
         return () => clearInterval(loop);
-    }, [gameState, level, wordDeck]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [gameState, level]);
 
     const spawnNextWord = () => {
         // Check game over
