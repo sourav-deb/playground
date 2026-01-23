@@ -127,6 +127,7 @@ export const SemantrisGame = () => {
 
         gameLoopRef.current = loop;
         return () => clearInterval(loop);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState, level, wordDeck]);
 
     const spawnNextWord = () => {
