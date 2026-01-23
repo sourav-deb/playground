@@ -24,7 +24,7 @@ export const Home = () => {
                     </div>
 
                     <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 animate-in slide-in-from-bottom-4 fade-in duration-700 delay-100">
-                        ARCADE<span className="text-blue-500">.AI</span>
+                        Playground<span className="text-blue-500">.AI</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed animate-in slide-in-from-bottom-4 fade-in duration-700 delay-200">
