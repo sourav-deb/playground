@@ -8,10 +8,10 @@ export const GameHeader = ({ playerScore, botScore, gamesPlayed, className }) =>
       {/* Title Section */}
       <div className="text-center space-y-4 relative">
         <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-50 pointer-events-none" />
-        <h1 className="relative text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 drop-shadow-sm">
+        <h1 className="relative text-4xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 drop-shadow-sm">
           RPS <span className="text-white/20">ARENA</span>
         </h1>
-        <p className="text-lg md:text-xl text-blue-200/60 font-medium tracking-wide">
+        <p className="text-sm md:text-xl text-blue-200/60 font-medium tracking-wide">
           MAN VS MACHINE
         </p>
       </div>

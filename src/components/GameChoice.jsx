@@ -39,9 +39,9 @@ export const GameChoice = ({ choice, onClick, disabled, isSelected, isWinner, is
         }}
       />
 
-      <div className="relative z-10 p-6 flex flex-col items-center gap-4">
+      <div className="relative z-10 p-3 md:p-6 flex flex-col items-center gap-2 md:gap-4">
         <div className={cn(
-          "relative w-32 h-32 transition-transform duration-500 drop-shadow-2xl",
+          "relative w-16 h-16 md:w-32 md:h-32 transition-transform duration-500 drop-shadow-2xl",
           !disabled && "group-hover:scale-110 group-hover:rotate-6",
           isSelected && "scale-110 rotate-12",
           isWinner && "animate-bounce"
@@ -54,7 +54,7 @@ export const GameChoice = ({ choice, onClick, disabled, isSelected, isWinner, is
         </div>
 
         <span className={cn(
-          "text-xl font-bold uppercase tracking-wider",
+          "text-xs md:text-xl font-bold uppercase tracking-wider",
           "text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400",
           isSelected && "text-primary from-primary to-primary/50"
         )}>

@@ -1,91 +1,133 @@
-// A simple but effective semantic mapping system for the game
+import * as tf from '@tensorflow/tfjs';
+import * as use from '@tensorflow-models/universal-sentence-encoder';
 
-const CATEGORIES = {
-    // Nature & Environment
-    nature: ["tree", "flower", "grass", "forest", "mountain", "river", "ocean", "rain", "sun", "cloud", "wind", "storm", "snow", "earth", "leaf", "plant"],
-    animal: ["dog", "cat", "bird", "lion", "tiger", "fish", "shark", "whale", "monkey", "bear", "snake", "eagle", "pet", "zoo", "wild", "farm", "cow", "pig"],
-    space: ["star", "moon", "planet", "mars", "galaxy", "asteroid", "comet", "sun", "sky", "alien", "ufo", "rocket", "orbit", "universe", "black hole"],
+let model = null;
+let modelLoadPromise = null;
 
-    // Food & Drink
-    food: ["pizza", "burger", "sushi", "pasta", "rice", "bread", "cheese", "fruit", "apple", "banana", "cake", "cookie", "chocolate", "soup", "salad", "meat", "vegetable"],
-    drink: ["water", "coffee", "tea", "juice", "soda", "beer", "wine", "milk", "cocktail", "lemonade", "liquid", "thirsty"],
-    flavor: ["sweet", "salty", "sour", "spicy", "hot", "cold", "bitter", "delicious", "yummy", "tasty"],
-
-    // Technology & Science
-    tech: ["computer", "phone", "robot", "internet", "wifi", "code", "screen", "keyboard", "mouse", "battery", "chip", "digital", "virtual", "ai", "data"],
-    science: ["atom", "energy", "lab", "chemical", "physics", "biology", "math", "gravity", "magnet", "experiment", "theory", "formula"],
-
-    // Emotions & Human
-    emotion: ["happy", "sad", "angry", "love", "hate", "fear", "joy", "smile", "cry", "laugh", "bored", "excited", "tired"],
-    body: ["hand", "foot", "head", "eye", "ear", "mouth", "nose", "hair", "brain", "heart", "leg", "arm", "finger", "face"],
-    clothing: ["shirt", "pants", "shoes", "hat", "dress", "jacket", "coat", "socks", "gloves", "glasses", "tie", "fashion", "wear"],
-
-    // Abstract
-    color: ["red", "blue", "green", "yellow", "purple", "orange", "black", "white", "pink", "brown", "gray", "dark", "light"],
-    time: ["now", "later", "yesterday", "tomorrow", "clock", "hour", "minute", "second", "day", "night", "week", "month", "year", "calendar"],
-
-    // Action
-    action: ["run", "jump", "walk", "sleep", "eat", "drink", "play", "work", "fight", "dance", "sing", "talk", "listen", "watch"]
-};
-
-// Inverse map: Word -> Categories
-const WORD_TO_CATEGORIES = {};
-Object.entries(CATEGORIES).forEach(([category, words]) => {
-    words.forEach(word => {
-        if (!WORD_TO_CATEGORIES[word]) WORD_TO_CATEGORIES[word] = [];
-        WORD_TO_CATEGORIES[word].push(category);
-    });
-});
+const TOPICS = [
+    'nature', 'science', 'food', 'technology', 'music',
+    'art', 'business', 'history', 'sports', 'weather',
+    'ocean', 'animal', 'emotion', 'travel', 'house'
+];
 
 /**
- * Returns a random word from the dictionary
+ * Loads the Universal Sentence Encoder model.
+ * Returns a promise that resolves when loaded.
  */
-export const getRandomWord = () => {
-    const categories = Object.keys(CATEGORIES);
-    const randomCat = categories[Math.floor(Math.random() * categories.length)];
-    const words = CATEGORIES[randomCat];
-    const word = words[Math.floor(Math.random() * words.length)];
-    return { text: word, category: randomCat };
+export const loadModel = async () => {
+    if (model) return model;
+
+    if (!modelLoadPromise) {
+        // Load the model (this downloads ~30MB)
+        console.log("Loading TensorFlow USE Model...");
+        modelLoadPromise = use.load();
+    }
+
+    model = await modelLoadPromise;
+    console.log("TensorFlow Model Loaded.");
+    return model;
 };
 
 /**
- * Calculates semantic similarity between input and a target word.
- * Returns score 0-100.
+ * Fetches words from Datamuse (keeping this for word generation)
  */
-export const getSimilarity = (input, targetWord, targetCategory) => {
-    const cleanInput = input.toLowerCase().trim();
-    const cleanTarget = targetWord.toLowerCase().trim();
+export const fetchTopicWords = async (topic) => {
+    try {
+        const cleanTopic = topic || TOPICS[Math.floor(Math.random() * TOPICS.length)];
+        const response = await fetch(`https://api.datamuse.com/words?ml=${cleanTopic}&max=50`);
+        const data = await response.json();
 
-    // 1. Direct Match
-    if (cleanInput === cleanTarget) return 100;
+        const words = data
+            .map(item => item.word)
+            .filter(w => !w.includes(' ') && w.length > 2);
 
-    // 2. Partial Match / Substring
-    if (cleanTarget.includes(cleanInput) && cleanInput.length > 2) return 80;
-    if (cleanInput.includes(cleanTarget)) return 80;
+        for (let i = words.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [words[i], words[j]] = [words[j], words[i]];
+        }
 
-    // 3. Category Match (The "Smart" Part)
-    // If input is "Food", it matches any word in the 'food' category
-    if (WORDS_IN_CATEGORY(cleanInput, targetCategory)) return 75;
-
-    // 4. Input is a sibling (User types "Dog", Target is "Cat") -> Both are 'animal'
-    if (ARE_SIBLINGS(cleanInput, targetWord)) return 60;
-
-    return 0;
+        return {
+            topic: cleanTopic,
+            words: words.slice(0, 30)
+        };
+    } catch (error) {
+        console.error("API Error:", error);
+        return { topic: 'offline', words: ['error', 'check', 'connection'] };
+    }
 };
 
-// Helper: Check if input exists in the target's category list
-const WORDS_IN_CATEGORY = (input, category) => {
-    const words = CATEGORIES[category];
-    if (!words) return false;
-    return words.includes(input);
+/**
+ * Calculates Cosine Similarity using TFJS
+ */
+export const checkSemanticMatch = async (input, activeWords) => {
+    if (!model) {
+        console.warn("Model not loaded yet!");
+        return null;
+    }
+
+    try {
+        const cleanInput = input.trim().toLowerCase();
+
+        // 0. Exact Match Disallowed
+        if (activeWords.some(w => w.text.toLowerCase() === cleanInput)) {
+            return null; // Strict rule
+        }
+
+        // 1. Embed Input
+        const inputEmbedding = await model.embed([cleanInput]);
+
+        // 2. Embed All Targets
+        const targetTexts = activeWords.map(w => w.text.toLowerCase());
+        const targetEmbeddings = await model.embed(targetTexts);
+
+        // 3. Calculate Cosine Similarity
+        // Dot product of normalized vectors = Cosine Similarity
+        // Matrix multiplication: [1, 512] x [512, N] = [1, N] scores
+        const scoresTensor = tf.matMul(
+            inputEmbedding,
+            targetEmbeddings,
+            false,
+            true
+        );
+
+        const scores = await scoresTensor.data();
+
+        // Cleanup tensors to prevent memory leak
+        inputEmbedding.dispose();
+        targetEmbeddings.dispose();
+        scoresTensor.dispose();
+
+        // 4. Find Best Match
+        let bestIndex = -1;
+        let highestScore = -1;
+
+        for (let i = 0; i < scores.length; i++) {
+            // Check threshold (e.g., 0.5 is usually decent relatedness in USE)
+            // "Dog" vs "Puppy" ~ 0.8
+            // "Dog" vs "Cat" ~ 0.6
+            // "Dog" vs "Car" ~ 0.1
+            if (scores[i] > highestScore) {
+                highestScore = scores[i];
+                bestIndex = i;
+            }
+        }
+
+        // Threshold tuning
+        const THRESHOLD = 0.55;
+
+        if (bestIndex !== -1 && highestScore > THRESHOLD) {
+            return {
+                match: activeWords[bestIndex],
+                score: Math.floor(highestScore * 1000) // 0-1000 scale
+            };
+        }
+
+        return null;
+
+    } catch (error) {
+        console.error("TFJS matching error:", error);
+        return null;
+    }
 };
 
-// Helper: Check if both words share a category
-const ARE_SIBLINGS = (wordA, wordB) => {
-    const catsA = WORD_TO_CATEGORIES[wordA] || [];
-    const catsB = WORD_TO_CATEGORIES[wordB] || [];
-    return catsA.some(c => catsB.includes(c));
-};
-
-// Export raw data for debug if needed
-export const DICTIONARY = CATEGORIES;
+export const getRandomTopic = () => TOPICS[Math.floor(Math.random() * TOPICS.length)];

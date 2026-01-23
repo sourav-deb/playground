@@ -230,7 +230,7 @@ export const RPSGame = () => {
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                                <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-3xl mx-auto">
                                     <GameChoice
                                         choice="rock"
                                         onClick={() => handlePlayerChoice('rock')}
@@ -260,9 +260,9 @@ export const RPSGame = () => {
                         </div>
                     </div>
 
-                    {/* Bot Analysis / Game Result Area */}
-                    <div className="lg:col-span-1 h-full">
-                        <div className="h-full hover:transform hover:scale-105 transition-transform duration-300">
+                    {/* Game Result Area */}
+                    <div className="lg:col-span-1 flex flex-col justify-center">
+                        <div className="hover:transform hover:scale-105 transition-transform duration-300">
                             <GameResult
                                 result={result}
                                 playerChoice={playerChoice}

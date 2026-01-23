@@ -80,57 +80,57 @@ export const GameResult = ({ result, playerChoice, botChoice, gameState }) => {
 
   return (
     <div className={cn(
-      "glass-card p-8 md:p-12 rounded-3xl text-center space-y-8 animate-in fade-in zoom-in duration-300 h-full flex flex-col justify-center",
+      "glass-card p-6 md:p-8 rounded-3xl text-center space-y-4 animate-in fade-in zoom-in duration-300 flex flex-col justify-center",
       (gameState === 'result' && revealBot) ? config.border : "border-white/5"
     )}>
       {/* Result Header */}
       <div className={cn("space-y-2 transition-all duration-500", (gameState === 'waiting') ? "opacity-50" : "opacity-100")}>
         <div className={cn(
-          "inline-flex p-4 rounded-full mb-4",
+          "inline-flex p-3 rounded-full mb-2",
           gameState === 'result' && "animate-bounce",
           config.bg
         )}>
-          <Icon className={cn("w-12 h-12", config.color)} />
+          <Icon className={cn("w-8 h-8", config.color)} />
         </div>
         <h2 className={cn(
-          "text-5xl md:text-7xl font-black tracking-tighter uppercase",
+          "text-3xl md:text-5xl font-black tracking-tighter uppercase",
           "text-transparent bg-clip-text bg-gradient-to-r",
           config.gradient
         )}>
           {gameState === 'result' && revealBot ? config.title : (gameState === 'waiting' ? 'READY' : '...')}
         </h2>
-        <p className="text-xl text-slate-400 font-medium tracking-wide">
+        <p className="text-sm text-slate-400 font-medium tracking-wide">
           {config.subtitle}
         </p>
       </div>
 
       {/* Versus Display */}
-      <div className="flex items-center justify-center gap-4 md:gap-12 py-4">
+      <div className="flex items-center justify-center gap-4 py-2">
         {/* Player */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className={cn(
-            "w-24 h-24 md:w-32 md:h-32 rounded-full glass-panel p-4 transition-all duration-500",
+            "w-20 h-20 md:w-24 md:h-24 rounded-full glass-panel p-3 transition-all duration-500",
             (gameState === 'result' && result === 'win' && revealBot) ? "ring-4 ring-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)]" : "opacity-80"
           )}>
             {playerChoice ? (
               <img src={images[playerChoice]} alt="You" className="w-full h-full object-contain animate-in zoom-in" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-4xl opacity-20">?</div>
+              <div className="w-full h-full flex items-center justify-center text-2xl opacity-20">?</div>
             )}
           </div>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">You</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">You</p>
         </div>
 
         {/* VS Badge */}
         <div className="relative">
           <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20" />
-          <span className="relative text-2xl md:text-4xl font-black italic text-slate-700">VS</span>
+          <span className="relative text-xl md:text-3xl font-black italic text-slate-700">VS</span>
         </div>
 
         {/* Bot */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className={cn(
-            "w-24 h-24 md:w-32 md:h-32 rounded-full glass-panel p-4 flex items-center justify-center transition-all duration-500",
+            "w-20 h-20 md:w-24 md:h-24 rounded-full glass-panel p-3 flex items-center justify-center transition-all duration-500",
             (gameState === 'result' && revealBot)
               ? (result === 'lose' ? "ring-4 ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.4)]" : "opacity-80")
               : "bg-slate-800/50"
@@ -138,10 +138,10 @@ export const GameResult = ({ result, playerChoice, botChoice, gameState }) => {
             {revealBot && botChoice ? (
               <img src={images[botChoice]} alt="Bot" className="w-full h-full object-contain animate-in zoom-in duration-300" />
             ) : (
-              <span className="text-4xl opacity-50">🤖</span>
+              <span className="text-2xl opacity-50">🤖</span>
             )}
           </div>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Bot</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Bot</p>
         </div>
       </div>
     </div>
