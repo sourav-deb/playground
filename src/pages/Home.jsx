@@ -24,7 +24,7 @@ export const Home = () => {
                     </div>
 
                     <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 animate-in slide-in-from-bottom-4 fade-in duration-700 delay-100">
-                        Playground<span className="text-blue-500">.AI</span>
+                        Playwith<span className="text-blue-500">.Deb</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed animate-in slide-in-from-bottom-4 fade-in duration-700 delay-200">
@@ -50,7 +50,7 @@ export const Home = () => {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-3xl font-bold text-white mb-2">RPS AI</h3>
+                                    <h3 className="text-3xl font-bold text-white mb-2">Rock Paper Scissors AI</h3>
                                     <p className="text-slate-400 font-medium">Rock Paper Scissors vs Adaptive Neural Net</p>
                                 </div>
                             </div>
