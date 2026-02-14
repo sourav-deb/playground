@@ -1,9 +1,4 @@
-name = "rps-arena"
-compatibility_date = "2024-05-12"
+name = "rps-frontend"
 pages_build_output_dir = "build"
 
-# SPA routing - handle client-side routes
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+# Remove any [[redirects]] or [redirects] sections here
