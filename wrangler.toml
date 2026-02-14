@@ -1,4 +1,4 @@
-name = "rps-frontend"
+name = "playground"
 pages_build_output_dir = "build"
 
 # Remove any [[redirects]] or [redirects] sections here
